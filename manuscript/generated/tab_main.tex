@@ -1,0 +1,15 @@
+\begin{table}[t]\centering\small
+\caption{\textbf{Main results on the held-out pool} (target $\alpha=0.05$, $\delta=0.1$; mean $\pm$ s.d. over 100 random calibration/test splits). Viol.: fraction of splits with selective risk above $\alpha$.}
+\label{tab:main}
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}lccccccc@{}}\toprule
+Method & Certified & Coverage & Selective risk & Miss rate & Goodput & Energy & Viol.\\
+ & & & & (\%) & (Mbit/epoch) & (J/Mbit) & \\\midrule
+Max-elevation (always aggressive) & no & 1.000 $\pm$ 0.000 & 0.133 $\pm$ 0.001 & 13.29 $\pm$ 0.11 & 348.9 $\pm$ 0.4 & 0.57 $\pm$ 0.00 & 1.00\\
+Always robust (dual diversity) & no & 0.000 $\pm$ 0.000 & 0.000 $\pm$ 0.000 & 1.19 $\pm$ 0.04 & 19.8 $\pm$ 0.0 & 20.13 $\pm$ 0.01 & 0.00\\
+Link-budget margin, tuned & no & 0.343 $\pm$ 0.002 & 0.051 $\pm$ 0.001 & 6.52 $\pm$ 0.09 & 142.4 $\pm$ 0.6 & 2.31 $\pm$ 0.01 & 0.81\\
+Logistic regression, tuned & no & 0.919 $\pm$ 0.001 & 0.054 $\pm$ 0.001 & 5.94 $\pm$ 0.07 & 350.8 $\pm$ 0.4 & 0.61 $\pm$ 0.00 & 1.00\\
+Gradient boosting, tuned & no & 0.936 $\pm$ 0.001 & 0.062 $\pm$ 0.001 & 6.80 $\pm$ 0.08 & 353.8 $\pm$ 0.4 & 0.60 $\pm$ 0.00 & 1.00\\
+Gradient boosting + LTT & yes & 0.898 $\pm$ 0.003 & 0.046 $\pm$ 0.002 & 5.23 $\pm$ 0.15 & 346.0 $\pm$ 0.5 & 0.63 $\pm$ 0.00 & 0.01\\
+PBA single model + LTT & yes & 0.900 $\pm$ 0.002 & 0.046 $\pm$ 0.001 & 5.26 $\pm$ 0.13 & 346.5 $\pm$ 0.5 & 0.63 $\pm$ 0.00 & 0.02\\
+\textbf{SeaSel (PBA ensemble + LTT)} & yes & 0.906 $\pm$ 0.002 & 0.046 $\pm$ 0.001 & 5.21 $\pm$ 0.14 & 349.0 $\pm$ 0.5 & 0.62 $\pm$ 0.00 & 0.01\\
+\bottomrule\end{tabular}}\end{table}

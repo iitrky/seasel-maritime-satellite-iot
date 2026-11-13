@@ -1,0 +1,9 @@
+\begin{table}[t]\centering\small
+\caption{\textbf{Cross-link transfer when half of the link histories are missing} (models retrained and evaluated with 50\% of satellite tokens lacking beacon history; $\alpha=0.05$).}
+\label{tab:transfer}
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}lcccccc@{}}\toprule
+Predictor & AUROC (all) & AUROC (no history) & ECE & AURC & Coverage & Selective risk\\\midrule
+Physics-biased attention & 0.881 & 0.858 & 0.015 & 0.0160 & 0.874 $\pm$ 0.003 & 0.046 $\pm$ 0.002\\
+Plain attention & 0.879 & 0.854 & 0.016 & 0.0161 & 0.872 $\pm$ 0.003 & 0.046 $\pm$ 0.002\\
+Per-link MLP & 0.878 & 0.850 & 0.018 & 0.0166 & 0.866 $\pm$ 0.004 & 0.046 $\pm$ 0.002\\
+\bottomrule\end{tabular}}\end{table}

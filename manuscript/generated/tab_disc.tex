@@ -1,0 +1,11 @@
+\begin{table}[t]\centering\small
+\caption{\textbf{Discrimination and calibration of the link-success predictors} on the held-out pool.}
+\label{tab:disc}
+\begin{tabular}{@{}lccc@{}}\toprule
+Predictor & AUROC $\uparrow$ & ECE $\downarrow$ & AURC $\downarrow$\\\midrule
+Link-budget margin & 0.684 & 0.209 & 0.1146\\
+Logistic regression & 0.903 & 0.009 & 0.0134\\
+Gradient boosting & 0.901 & 0.020 & 0.0135\\
+PBA single model & 0.901 & 0.010 & 0.0136\\
+SeaSel ensemble & 0.907 & 0.005 & 0.0126\\
+\bottomrule\end{tabular}\end{table}

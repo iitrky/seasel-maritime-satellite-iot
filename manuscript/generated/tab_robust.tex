@@ -1,0 +1,12 @@
+\begin{table}[t]\centering\small
+\caption{\textbf{Robustness to sensor corruption at test time.} Fixed certificate from clean calibration versus recalibration on corrupted data ($\alpha=0.05$).}
+\label{tab:robust}
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}lccccc@{}}\toprule
+ & & \multicolumn{2}{c}{Clean certificate} & \multicolumn{2}{c}{Recalibrated}\\
+Corruption & AUROC & Coverage & Selective risk & Coverage & Selective risk\\\midrule
+IMU noise 1 deg & 0.897 & 0.918 & 0.040 & 0.931 & 0.045\\
+IMU noise 3 deg & 0.875 & 0.847 & 0.027 & 0.915 & 0.045\\
+Rain sensor noise x3 & 0.900 & 0.923 & 0.043 & 0.930 & 0.045\\
+30\% context missing & 0.898 & 0.936 & 0.048 & 0.928 & 0.045\\
+50\% link history missing & 0.874 & 0.947 & 0.063 & 0.903 & 0.045\\
+\bottomrule\end{tabular}}\end{table}

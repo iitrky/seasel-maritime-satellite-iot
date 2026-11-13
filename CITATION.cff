@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Certified selective link prediction for maritime Internet of Things over low Earth orbit satellites (SeaSel code and testbed)"
+authors:
+  - family-names: "Louis"
+    given-names: "A. Bamila Virgin"
+    affiliation: "Department of Computer Science and Engineering, St. Xavier's Catholic College of Engineering, Nagercoil, India"
+    email: "bamilavirgin@sxcce.edu.in"
+    orcid: "https://orcid.org/0000-0003-0297-4004"
+license: MIT
+version: "1.0.0"
+date-released: "2026-11-13"
+keywords:
+  - maritime Internet of Things
+  - LEO satellite networks
+  - selective prediction
+  - distribution-free risk control
+  - attention

@@ -1,0 +1,124 @@
+% ===========================================================================
+\section{Baselines and experimental setup}\label{sec:setup}
+% ===========================================================================
+\subsection{Sandbox testbed}
+All experiments run in an open, sandboxed digital testbed that generates every observation available to a vessel gateway together with the ground-truth outcome of transmitting on every candidate link (Table~\ref{tab:params}). The space segment consists of two Walker-delta shells, 792 satellites at 550\,km and 53$^\circ$ inclination and 240 polar satellites at 560\,km and 97.6$^\circ$, propagated with Earth rotation; this mirrors the layered shells of current broadband constellations\cite{kodheli2021,michel2022}. Forty vessels sail great-circle routes between twelve major ports at 10--22 knots, so the data include open-ocean, high-latitude and near-port segments. A sea-state field combines a latitude climate with storms that move across vessel tracks and carry both waves and rain; background convective rain cells add further variability. Roll and pitch are synthesised at 2\,Hz from a narrow-band wave spectrum centred on each vessel's natural period, with amplitude proportional to the local significant wave height. Each vessel has one or two superstructure blockage sectors. Link outcomes follow equations (\ref{eq:snr})--(\ref{eq:labels}) with Rician fading, scintillation and handover failure; coastal links follow a sea-path loss with a slowly varying ducting term near ports.
+
+The training day (seed 0) provides 24 vessels for training, 4 for validation and 12 held-out vessels; an independent day (seed 1) provides 40 further vessels. The held-out vessels and the independent day form the evaluation pool of \RNPool{} epochs, which is split at random 100 times into equal calibration and test halves. Three shifted days test out-of-distribution behaviour: severe storms (significant wave height up to 9.5\,m against 6.4\,m in training, rain up to 88\,mm\,h$^{-1}$, storms on 85\% of tracks), tropical routes with frequent heavy convective rain, and a degraded constellation in which 30\% of satellites have failed and the remainder suffer a 2\,dB ageing loss. In the evaluation pool, an aggressive transmission on a random candidate succeeds with probability \RPAggr\%, a robust one with probability \RPRob\%, a vessel sees \RNCand{} candidates on average, and \RNoLink\% of epochs have no usable link at all.
+
+\begin{table}[t]
+\centering\small
+\caption{\textbf{Testbed and training parameters.}}
+\label{tab:params}
+\begin{tabular}{@{}ll@{\hspace{1.5em}}ll@{}}
+\toprule
+Parameter & Value & Parameter & Value\\\midrule
+Shell 1 & 550 km, 53$^\circ$, $36\times22$ & Shell 2 & 560 km, 97.6$^\circ$, $12\times20$\\
+Minimum elevation $\theta_{\min}$ & 25$^\circ$ & Candidates $K$ & 8 satellites + 1 coastal\\
+Epoch $\Delta$, transmission $T_x$ & 60 s, 20 s & Vessels per day, horizon & 40, 24 h\\
+$\mathrm{SNR}_{\rm ref}$ (zenith) & 23 dB & Scan exponent $n_{\rm s}$, max scan & 1.3, 70$^\circ$\\
+Beamwidth $\theta_{3\mathrm{dB}}$ & 3$^\circ$ & Blockage loss & 25 dB\\
+Rain law $a$, $b$, $h_R$ & 0.0374, 1.15, 4 km & Thresholds $\eta_A$, $\eta_R$ & 10 dB, $-2$ dB\\
+Rates $R_\ell$ (satellite, coastal), $R_0$ & 20, 40, 1 Mbit\,s$^{-1}$ & Transmit power & 10 W\\
+IMU rate, segment $w$ & 2 Hz, 60 s & Model width $d$, $d_k$ & 32, 16\\
+Ensemble $M$, epochs & 5, 12 & Optimiser & Adam, cosine, $3\times10^{-3}$\\
+Target $\alpha$, confidence $\delta$ & 0.05, 0.10 & Grid $|\Lambda|$ & $4\times70$\\
+Online step $\mu$ & 0.02 & Calibration/test splits & 100\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Baselines}
+Eight policies are compared, all using the same aggressive and robust transmission schemes. \emph{Max-elevation} always transmits aggressively on the highest satellite (or the coastal link when available), the classical rule for LEO terminals. \emph{Always robust} always uses the dual-link robust mode. \emph{Link-budget margin} predicts the SNR margin from the clear-sky budget and the last beacon deficit and accepts above a margin tuned on validation data. \emph{Logistic regression} and \emph{gradient boosting} are per-link classifiers on the same token and context features, with a softmax-response threshold tuned on validation data to reach $\alpha$ without certification\cite{hendrickx2024}. \emph{Gradient boosting with LTT} applies the SeaSel certificate to the gradient-boosting predictor, isolating the contribution of the model. \emph{PBA single model} applies the certificate to one physics-biased attention network without ensemble uncertainty. \emph{SeaSel} is the full method.
+
+\subsection{Metrics and protocol}
+Reported metrics are the coverage $c$, the selective risk $R_{\rm sel}$, the critical-message miss rate $\mathcal M$, the goodput $\mathcal G$, the energy per delivered megabit, the violation frequency (fraction of the 100 splits in which $R_{\rm sel}>\alpha$, which Theorem~\ref{thm:cert} bounds by $\delta$), the area under the receiver operating characteristic curve (AUROC), the expected calibration error (ECE) and the area under the risk--coverage curve (AURC). All code is written in Python with NumPy, SciPy, scikit-learn and autograd. The complete campaign of \RRuntime{} minutes ran on four CPU cores, and one SeaSel decision takes \RMsDec{}\,ms on a single core.
+
+\subsection{Use of AI tools}
+A large language model (Claude, Anthropic) was used to assist with programming the testbed and drafting and editing the text. The author designed and verified the study and takes full responsibility for the content.
+
+% ===========================================================================
+\section{Quantitative results}\label{sec:results}
+% ===========================================================================
+\subsection{Certified operation versus baselines}
+Table~\ref{tab:main} compares all policies at $\alpha=0.05$. Always-aggressive operation on the highest satellite delivers \RAAGood{}\,Mbit per epoch but loses \RAAMiss\% of critical messages, because every misjudged link becomes a deadline miss. Always-robust operation reduces misses to \RARMiss\% but cuts goodput to \RARGood{}\,Mbit and raises energy per delivered megabit to \RAREnergy{}\,J. SeaSel accepts \RSCov\% of epochs with a selective risk of \RSRisk\%, misses \RSMiss\% of critical messages, \RMissRed\% fewer than always-aggressive operation, and delivers \RSGood{}\,Mbit per epoch, \RGoodRatio{} times the goodput of always-robust operation and the same goodput as always-aggressive operation (Fig.~\ref{fig:pareto}). Its selective risk exceeded the target in only \RSViol{} of the 100 calibration/test splits, well within the guaranteed $\delta=0.10$.
+
+\input{generated/tab_main}
+
+The uncertified baselines show why certification is needed. Thresholds tuned on validation data look adequate during tuning but exceed the target on new data: gradient boosting with a tuned threshold reaches a selective risk of \RGTRisk\% and violates the target in \RGTViol{} of the splits; logistic regression behaves the same way, and the link-budget heuristic violates it in 81\% of splits while accepting only a third of the epochs. Applying the SeaSel certificate to the same gradient-boosting predictor removes the violations (selective risk \RGRisk\%, coverage \RGCov\%). The certificate is therefore model-agnostic, and the guarantee comes from the certification layer rather than from any particular predictor.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\textwidth]{../figures/fig_pareto.png}
+\caption{\textbf{Goodput against critical-message miss rate.} Curves sweep the acceptance threshold; markers show the certified SeaSel operating point and the two fixed policies. SeaSel matches always-aggressive goodput while removing most of its misses.}
+\label{fig:pareto}
+\end{figure}
+
+\subsection{Prediction quality and calibration}
+Table~\ref{tab:disc} and Fig.~\ref{fig:riskcov} report discrimination and calibration. The SeaSel ensemble attains the highest AUROC (\RSAuroc), the lowest calibration error (\RSEce{} against \RGEce{} for gradient boosting) and the lowest area under the risk--coverage curve (\RSAurc). Its margin in AUROC over the strongest tabular baseline is small (\RSAuroc{} against \RGAuroc), so in-distribution gains in coverage are modest: SeaSel certifies \RCovGain{} percentage points more epochs than gradient boosting with the same certificate. The reliability diagram (Fig.~\ref{fig:reliability}) shows that the ensemble probabilities lie close to the diagonal, which matters because the uncertainty-penalised score (\ref{eq:choice}) uses them directly. The physics-free link-budget heuristic reaches an AUROC of only \RLAuroc, which confirms that motion, weather and history must be learned jointly.
+
+\input{generated/tab_disc}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.6\textwidth]{../figures/fig_risk_coverage.png}
+\caption{\textbf{Risk--coverage curves of the link predictors.} Selective risk of aggressive transmissions as a function of the fraction of accepted epochs.}
+\label{fig:riskcov}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.5\textwidth]{../figures/fig_reliability.png}
+\caption{\textbf{Reliability diagram.} Observed against predicted success probability on the evaluation pool.}
+\label{fig:reliability}
+\end{figure}
+
+\subsection{Validity of the guarantee across risk targets}
+Figure~\ref{fig:alpha} varies the target from $\alpha=0.02$ to $0.15$. With certification, the realised selective risk stays at or below the diagonal for every target, and the violation frequency never exceeds 0.04 for either SeaSel or certified gradient boosting. The tuned threshold lies above the diagonal for all targets up to 0.08 and violates them in every split. Certification costs coverage only where it should: at $\alpha=0.02$ SeaSel accepts 77\% of epochs, and coverage approaches 99\% at $\alpha=0.10$.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/fig_alpha_sweep.png}
+\caption{\textbf{Guarantee validity across targets.} (\textbf{a}) Realised selective risk (mean $\pm$ s.d.\ over 60 splits) against the target $\alpha$; certified methods stay on or below the diagonal. (\textbf{b}) Coverage obtained at each target.}
+\label{fig:alpha}
+\end{figure}
+
+% ===========================================================================
+\section{Ablation, robustness, and OOD analyses}\label{sec:ablation}
+% ===========================================================================
+\subsection{Ablation}
+Table~\ref{tab:ablation} removes one component at a time and retrains where necessary. The certificate keeps every variant within the target, so ablations affect only how many epochs can be accepted. Removing the link-history features (beacon deficit, blockage evidence) is by far the most damaging change: AUROC falls from \RSAuroc{} to \RAbNoHistAuroc{} and coverage from \RSCov\% to \RAbNoHistCov\%. The remaining components have small effects in distribution: removing the physics bias, replacing attention by mean pooling or by a per-link network, removing the motion context, removing the uncertainty penalty or temperature scaling, and using a single member each change coverage by less than one percentage point. In this testbed the previous beacon of each link already summarises most of the rain, blockage and motion state that the other features describe, so the per-link evidence dominates.
+
+\input{generated/tab_ablation}
+
+\subsection{Cross-link transfer without history}
+The value of reasoning across links appears when per-link evidence is missing, as for a satellite that has just risen or a terminal that has just restarted. Table~\ref{tab:transfer} retrains the three architectures with half of the satellite tokens lacking history and evaluates them in the same condition. On the tokens without history, physics-biased attention reaches an AUROC of \RTrPBAMiss, against \RTrATTMiss{} for plain attention and \RTrMLPMiss{} for the per-link network, and it certifies the largest coverage (\RTrPBACov\% against \RTrATTCov\% and \RTrMLPCov\%). The ordering is consistent but the margins are small. The geometric prior helps the model borrow evidence from nearby links, but it is a refinement of the prediction rather than the source of the guarantee.
+
+\input{generated/tab_transfer}
+
+\subsection{Robustness to sensor corruption}
+Table~\ref{tab:robust} corrupts the gateway inputs at test time. With the certificate obtained on clean data, inertial noise of 1--3$^\circ$, a threefold noisier rain gauge and 30\% missing context leave the selective risk below 5\%. Losing half of the link histories, however, raises it to 6.3\%, above the target, because the clean certificate no longer matches the input distribution. Recalibrating on data with the same corruption restores the target in every case; for missing histories this costs about four percentage points of coverage. Corruption of the history channel should therefore trigger recalibration or the online rule.
+
+\input{generated/tab_robust}
+
+\subsection{Out-of-distribution operation}
+Table~\ref{tab:ood} and Fig.~\ref{fig:ood} evaluate three shifted days with the certificate obtained in distribution. Distribution shift breaks the in-distribution guarantee in all three cases: the selective risk rises to \RStormNaive\% on the severe-storm day, \RTropNaive\% on the tropical day and \RConstNaive\% when 30\% of satellites have failed. The sea-state-conditional certificate restores the target under storms (\RStormMond\%), where the shift is captured by the roll-RMS groups, but not under tropical rain or constellation loss, whose shifts are unrelated to sea state. The online rule (\ref{eq:online}) restores the target in all three cases (\RStormOnline\%, \RTropOnline\% and \RConstOnline\%) by lowering coverage to \RStormOnlineCov\%, \RTropOnlineCov\% and \RConstOnlineCov\%. Its coverage is close to that of an oracle that recalibrates on the shifted day itself. Figure~\ref{fig:ood}b shows the mechanism on the storm day: the fixed certificate lets the running risk climb to about 12\% at the height of the storm, whereas the online threshold keeps it near 5\% throughout. Always-aggressive operation would have lost \RStormAAMiss\% of critical messages on this day.
+
+\input{generated/tab_ood}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/fig_ood.png}
+\caption{\textbf{Operation under distribution shift.} (\textbf{a}) Selective risk on three shifted days for the in-distribution certificate, the sea-state-conditional certificate, the online rule and an oracle recalibrated on the shifted day. (\textbf{b}) Running selective risk over the severe-storm day for the fixed certificate and the online rule. The dotted line marks $\alpha=0.05$.}
+\label{fig:ood}
+\end{figure}
+
+% ===========================================================================
+\section{Discussion, operational utility, and limitations}\label{sec:discussion}
+% ===========================================================================
+The results show that the main value of SeaSel lies in its decision interface rather than in its predictor. A certified threshold turns any well-calibrated link predictor into a policy with a verifiable reliability level. For a fleet operator this means alarm and safety telemetry can be given a contractual miss rate while bulk data still travel at near-aggressive rates, with no extra satellite capacity. The certificate is cheap: one calibration run per window, and \RMsDec{}\,ms per decision. The same mechanism applies to other risk-sensitive decisions on a vessel gateway, such as choosing a modulation order, scheduling handovers or deciding when to store and forward. Three limitations remain. First, all results come from a simulated testbed; field logs from vessels are needed to confirm the channel and motion models, although the certificate itself remains valid for any data that satisfy its exchangeability assumption. Second, the guarantee holds only under exchangeability, so drift must be handled by recalibration or by the online rule, whose guarantee is asymptotic. Third, the architectural gains of physics-biased attention are modest in distribution; larger fleets, richer beam-level telemetry and three-dimensional ray geometry may increase them.
+
+% ===========================================================================
+\section{Conclusion}\label{sec:conclusion}
+% ===========================================================================
+This paper introduced SeaSel, a framework that lets a vessel gateway act on learned satellite-link predictions only when a finite-sample certificate guarantees that accepted decisions rarely fail. The framework combines a physics-biased attention ensemble over all candidate links, a Learn-then-Test certificate with exact binomial p-values, a dual-link robust fallback with an explicit service-level bound, and sea-state-conditional and online variants for distribution shift. On a sandbox testbed with a two-shell constellation, storms, ship motion and blockage, SeaSel held the selective risk at \RSRisk\% for a 5\% target and cut critical-message misses by \RMissRed\% without losing goodput. Uncertified thresholds violated the target in almost every split. Under storms, tropical rain and constellation degradation, the online rule restored the target where the fixed certificate failed. The results also show where the gains come from: link history is the most informative input, calibration quality determines how many epochs can be certified, and drift is the main threat to the guarantee. Future work will validate the framework on field logs from vessels, extend it to multi-vessel coordination and inter-satellite routing, and study certificates that adapt to sea state, season and constellation health together.

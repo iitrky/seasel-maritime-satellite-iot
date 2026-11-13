@@ -1,0 +1,33 @@
+\documentclass[11pt,border=6pt,varwidth=16.5cm]{standalone}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,bm}
+\usepackage{algpseudocode}
+\begin{document}
+\begin{minipage}{16cm}
+\hrule\smallskip\noindent\textbf{Algorithm 1} SeaSel: certified selective link prediction at a vessel gateway\smallskip\hrule
+\begin{algorithmic}[1]
+\Require training log $\mathcal D_{\rm tr}$, validation log $\mathcal D_{\rm val}$, calibration log $\mathcal D_{\rm cal}$, target risk $\alpha$, confidence $\delta$, grid $\Lambda$, step $\mu$
+\Statex \textit{Offline phase}
+\State segment IMU streams into $\mathcal W_t$ and build tokens $\bm x_{t,\ell}$, context $\bm c_t$, masks $m_{t,\ell}$ \Comment{Eqs.\ (13)--(17)}
+\For{$m=1,\dots,M$}
+  \State train physics-biased attention network $\bm\Theta^{(m)}$ on a bootstrap of $\mathcal D_{\rm tr}$ by minimising $\mathcal J$ \Comment{Eqs.\ (18)--(23)}
+\EndFor
+\State fit temperature $T$ on $\mathcal D_{\rm val}$ \Comment{Eq.\ (24)}
+\Statex \textit{Calibration phase}
+\For{$(\gamma,\lambda)\in\Lambda$}
+  \State compute $n_{\gamma,\lambda}$, $k_{\gamma,\lambda}$ on $\mathcal D_{\rm cal}$ and $\pi_{\gamma,\lambda}=\Pr[\mathrm{Bin}(n_{\gamma,\lambda},\alpha)\le k_{\gamma,\lambda}]$ \Comment{Eqs.\ (26)--(27)}
+\EndFor
+\State $\hat\Lambda\gets\{(\gamma,\lambda):\pi_{\gamma,\lambda}\le\delta/|\Lambda|\}$; \ $(\hat\gamma,\hat\lambda)\gets$ certified pair of largest coverage; \ $\lambda_1\gets\hat\lambda$ \Comment{Eq.\ (28)}
+\Statex \textit{Deployment phase (every epoch $t$)}
+\State compute $\bar p_{t,\ell}$, $\sigma_{t,\ell}$, $\hat r_{t,\ell}$ for all $\ell\in\mathcal L_t$ \Comment{Eq.\ (25)}
+\State $\ell^\star_t\gets\arg\max_\ell \bar p_{t,\ell}R_\ell$; \ $s_t\gets\bar p_{t,\ell^\star_t}-\hat\gamma\,\sigma_{t,\ell^\star_t}$ \Comment{Eq.\ (6)}
+\If{$s_t\ge\lambda_t$}
+  \State transmit critical and bulk data on $\ell^\star_t$ with the aggressive scheme; $A_t\gets1$
+\Else
+  \State transmit critical data with the robust scheme on the two links of largest $\hat r_{t,\ell}$; $A_t\gets0$
+\EndIf
+\State observe acknowledgement, set $E_t$; \ $\lambda_{t+1}\gets\Pi_{[0,1]}(\lambda_t+\mu A_t(E_t-\alpha))$ \Comment{Eq.\ (30), optional}
+\end{algorithmic}
+\hrule
+\end{minipage}
+\end{document}

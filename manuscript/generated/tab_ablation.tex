@@ -1,0 +1,15 @@
+\begin{table}[t]\centering\small
+\caption{\textbf{Ablation study} (retrained variants; $\alpha=0.05$, $\delta=0.1$, 100 splits).}
+\label{tab:ablation}
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}lcccccc@{}}\toprule
+Variant & AUROC & ECE & Coverage & Selective risk & Goodput (Mbit) & Viol.\\\midrule
+\textbf{Full SeaSel} & 0.907 & 0.005 & 0.906 $\pm$ 0.002 & 0.046 $\pm$ 0.001 & 349.0 $\pm$ 0.5 & 0.01\\
+Without physics bias (plain attention) & 0.906 & 0.006 & 0.905 $\pm$ 0.002 & 0.046 $\pm$ 0.001 & 348.5 $\pm$ 0.5 & 0.01\\
+Mean pooling instead of attention & 0.907 & 0.007 & 0.908 $\pm$ 0.002 & 0.046 $\pm$ 0.001 & 349.6 $\pm$ 0.5 & 0.01\\
+Without attention (per-link MLP) & 0.906 & 0.005 & 0.903 $\pm$ 0.002 & 0.046 $\pm$ 0.001 & 347.8 $\pm$ 0.5 & 0.01\\
+Without motion and weather context & 0.906 & 0.009 & 0.906 $\pm$ 0.002 & 0.046 $\pm$ 0.002 & 349.1 $\pm$ 0.5 & 0.01\\
+Without link-history features & 0.850 & 0.035 & 0.805 $\pm$ 0.005 & 0.046 $\pm$ 0.002 & 312.3 $\pm$ 1.3 & 0.02\\
+Without uncertainty penalty (gamma = 0) & 0.907 & 0.005 & 0.907 $\pm$ 0.002 & 0.046 $\pm$ 0.002 & 349.2 $\pm$ 0.5 & 0.01\\
+Without temperature scaling & 0.907 & 0.007 & 0.906 $\pm$ 0.002 & 0.046 $\pm$ 0.001 & 349.1 $\pm$ 0.5 & 0.01\\
+Single member (M = 1) & 0.901 & 0.010 & 0.900 $\pm$ 0.002 & 0.046 $\pm$ 0.001 & 346.5 $\pm$ 0.5 & 0.02\\
+\bottomrule\end{tabular}}\end{table}

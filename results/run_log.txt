@@ -1,0 +1,15 @@
+simulations ready 0s
+SeaSel ensemble 2s T=1.04
+main comparison 128s
+sweeps 250s
+ablation Without physics bias (plain attention) 294s
+ablation Mean pooling instead of attention 327s
+ablation Without attention (per-link MLP) 359s
+ablation Without motion and weather context 402s
+ablation Without link-history features 448s
+robustness 587s
+cross-link transfer
+   Physics-biased attention 0.8812 0.858
+   Plain attention 0.8787 0.8536
+   Per-link MLP 0.8775 0.8504
+done 909s

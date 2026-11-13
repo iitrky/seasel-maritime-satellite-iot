@@ -1,0 +1,10 @@
+__pycache__/
+**/__pycache__/
+*.pyc
+results/cache/
+manuscript/build/
+*.aux
+*.log
+!results/run_log.txt
+*.out
+figures/diagrams/*.pdf

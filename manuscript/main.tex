@@ -1,0 +1,61 @@
+% Scientific Reports article: certified selective link prediction for maritime IoT over LEO satellites
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,amsthm,bm}
+\usepackage{graphicx,booktabs,array,multirow}
+\usepackage[super,sort&compress,comma]{natbib}
+\usepackage[hidelinks]{hyperref}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf,labelsep=period}
+\usepackage{setspace}
+\setstretch{1.5}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+
+\input{generated/numbers}
+
+\title{\textbf{Certified selective link prediction for maritime Internet of Things over low Earth orbit satellites}}
+\author{A. Bamila Virgin Louis$^{1,*}$}
+\date{\small $^{1}$Department of Computer Science and Engineering, St. Xavier's Catholic College of Engineering, Nagercoil, India.\\
+$^{*}$Correspondence: A. Bamila Virgin Louis, Email: bamilavirgin@sxcce.edu.in, ORCID: 0000-0003-0297-4004}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent Ships increasingly rely on low Earth orbit satellites to deliver Internet of Things data, yet a vessel link can fail without warning because satellites set, rain cells pass, masts block the sky and the ship rolls with the sea. Learned link predictors improve average decisions but give no guarantee on how often an accepted decision fails, which matters for alarms and other critical messages. This paper presents SeaSel, a certified selective link-prediction framework. A physics-biased attention ensemble reasons over all visible satellites and coastal links, using the angular separation of links as an attention prior. A Learn-then-Test certificate with exact binomial p-values selects when the gateway may transmit aggressively and when it must abstain to a robust dual-link mode, guaranteeing with probability $1-\delta$ that the failure rate of accepted decisions stays below a target $\alpha$. Sea-state-conditional and online variants handle distribution shift. On a sandbox testbed with a two-shell constellation, forty vessels over independent days, storms and ship motion, SeaSel kept the selective risk at \RSRisk\% for a 5\% target while accepting \RSCov\% of epochs. It reduced critical-message misses by \RMissRed\% relative to always-aggressive operation and delivered \RGoodRatio{} times the goodput of always-robust operation.
+\end{abstract}
+
+\noindent\textbf{Keywords:} maritime Internet of Things; low Earth orbit satellite networks; selective prediction; distribution-free risk control; physics-biased attention; link selection
+
+\input{part1}
+\input{part2}
+\input{part3}
+
+\section*{Data availability}
+All data analysed in this study were generated with the open sandbox testbed described in Section~\ref{sec:setup}. The generated datasets and raw results are available in the code repository listed below.
+
+\section*{Code availability}
+The complete implementation (testbed, models, certification, experiments, figures and manuscript sources) is available at \texttt{https://github.com/<account>/seasel-maritime-satellite-iot} (to be made public on submission).
+
+\section*{Acknowledgements}
+The author thanks St. Xavier's Catholic College of Engineering, Nagercoil, for institutional support.
+
+\section*{Author contributions}
+A.B.V.L. conceived the study, developed the framework and algorithm, implemented the testbed and experiments, analysed the results and wrote the manuscript.
+
+\section*{Funding}
+This research received no specific grant from any funding agency in the public, commercial or not-for-profit sectors.
+
+\section*{Competing interests}
+The author declares no competing interests.
+
+\section*{Additional information}
+\textbf{Correspondence} and requests for materials should be addressed to A.B.V.L. (bamilavirgin@sxcce.edu.in).
+
+\input{refs}
+
+\end{document}

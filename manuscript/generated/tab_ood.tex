@@ -1,0 +1,10 @@
+\begin{table}[t]\centering\small
+\caption{\textbf{Out-of-distribution operation} (target $\alpha=0.05$). Sel.: selective risk; Cov.: coverage; Miss: critical-message miss rate.}
+\label{tab:ood}
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}lcccccccccc@{}}\toprule
+ & & \multicolumn{2}{c}{Always aggressive} & \multicolumn{2}{c}{In-distribution certificate} & \multicolumn{2}{c}{Sea-state conditional} & \multicolumn{2}{c}{Online adaptive}\\
+Shift & AUROC & Sel. & Miss & Sel. & Cov. & Sel. & Cov. & Sel. & Cov.\\\midrule
+Severe storms & 0.948 & 0.312 & 31.2\% & 0.057 & 0.687 & 0.048 & 0.661 & 0.049 & 0.670\\
+Tropical rain & 0.906 & 0.128 & 12.8\% & 0.058 & 0.913 & 0.057 & 0.909 & 0.049 & 0.890\\
+30\% satellite loss & 0.906 & 0.190 & 19.0\% & 0.101 & 0.877 & 0.101 & 0.867 & 0.050 & 0.757\\
+\bottomrule\end{tabular}}\end{table}
